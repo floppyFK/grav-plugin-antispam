@@ -99,7 +99,10 @@ class AntispamPlugin extends Plugin
 
       $shift = strlen($address);
 
-      $txt = "<script type=\"text/javascript\" language=\"javascript\">\n" .
+      $uniqueid = $this->generateRandomString();
+
+      $txt = "<div id='" . $uniqueid . "'></div>" .
+      "<script type=\"text/javascript\" language=\"javascript\">\n" .
       "// Email obfuscator script 2.1 by Tim Williams, University of Arizona\n".
       "// Random encryption key feature by Andrew Moulden, Site Engineering Ltd\n".
       "// PHP version coded by Ross Killen, Celtic Productions Ltd\n".
@@ -140,10 +143,22 @@ class AntispamPlugin extends Plugin
       " link += (key.charAt(ltr))\n".
       " }\n".
       " }\n".
-      "document.write(\"<a href='mailto:\"+link+\"'>\"+".$string."+\"</a>\")\n" .
+      " $(document).ready(function () {\n" .
+      " document.getElementById('" . $uniqueid . "').innerHTML = \"<a href='mailto:\"+link+\"'>\"+".$string."+\"</a>\";\n" .
+      " });\n" .
       "\n".
       "<" . "/script><noscript>".$this->grav['language']->translate(['PLUGIN_ANTISPAM.NOSCRIPT'])."<"."/noscript>";
       //dump($txt);
       return $txt;
+    }
+    
+    private function generateRandomString($length = 10) {
+        $characters = '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ';
+        $charactersLength = strlen($characters);
+        $randomString = '';
+        for ($i = 0; $i < $length; $i++) {
+            $randomString .= $characters[rand(0, $charactersLength - 1)];
+        }
+        return $randomString;
     }
 }
